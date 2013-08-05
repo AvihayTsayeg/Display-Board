@@ -1,0 +1,51 @@
+#In order to send message to Display, you must first issue these commands:
+#    1-  ln -s /dev/[PortNameHere] /dev/prolite
+#  1.5-  dmesg|less and then /tty____ fo find the port name
+#    2-  chmod a+rw /dev/prolite
+import argparse
+import time
+
+parser = argparse.ArgumentParser()
+words = parser.add_argument("words", help="Number of words", type=int)
+message = parser.add_argument("message", help="Message/Word(s)", type=str)
+font = parser.add_argument("font", help="Font choice", type=int)
+color = parser.add_argument("color", help="Color choice", type=int)
+function = parser.add_argument("function", help="Function choice", type=int)
+
+args = parser.parse_args()
+words = args.words
+message = args.message
+font = args.font
+color = args.color
+function = args.function
+
+dictFont={1:"<SA>", 2:"<SB>", 3:"<SC>", 4:"<SD>", 5:"<SE>", 6:"<SF>", 7:"<SG>", 8:"<SH>"}
+dictColor={1:"<CP>", 2:"<FE>", 3:"<FU>", 4:"<CC>", 5:"<CB>", 6:"<CA>", 7:"<CE>", 8:"<CD>", 9:"<CL>", 10:"<CM>", 11:"<CN>", 12:"<CH>", 13:"<CG>", 14:"<CF>", 15:"<CS>", 16:"<CQ>", 17:"<CT>", 18:"<CR>"}
+dictFunction={1:"<FS>", 2:"<FB>", 3:"<FF>", 4:"<FG>", 5:"<FH>", 6:"<FI>", 7:"<FJ>", 8:"<FK>", 9:"<FL>", 10:"<FR>", 11:"<FD>", 12:"<FT>"}
+
+send = "<ID01><PA>"
+counter = 0
+
+while(counter < words):
+
+    send+=str(dictFont[font])
+    send+=str(dictColor[color])
+    send+=str(dictFunction[function])
+    send+=str(message)
+
+    length = 0
+
+    if(int(counter) == words-1):
+        send+=("               <FQ><FP>")
+    counter+=1
+
+file = open("/dev/prolite", "w")
+print >> file, str(send)
+file.close()
+print("\nCommand sent: "+send+"\n")
+
+time.sleep(30)
+send = "<ID01><PA><FQ>"
+file = open("/dev/prolite", "w")
+print >> file, str(send)
+file.close()
